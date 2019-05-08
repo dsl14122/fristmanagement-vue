@@ -9,6 +9,10 @@ import 'element-ui/lib/theme-chalk/index.css';
 //导入路由文件
 import  router from './router.js'
 
+//导入 网络请求的对象
+import request from "./libs/http"
+Vue.use(request)
+
 Vue.config.productionTip = false
 
 new Vue({

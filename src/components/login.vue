@@ -1,13 +1,13 @@
 <template>
   <div class="login">
     <div class="center_box">
-        <h2>用户登录</h2>
-      <el-form label-position="top" label-width="80px" >
-        <el-form-item  label="用户名">
-          <el-input></el-input>
+      <h2>用户登录</h2>
+      <el-form :model="loginForm" :rules="loginRules" label-position="top" label-width="80px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="loginForm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="loginForm.password" type='password'></el-input>
         </el-form-item>
         <el-form-item>
           <el-button class="btnLogin" type="primary">登 录</el-button>
@@ -19,7 +19,28 @@
 
 <script>
 export default {
-  name: "login"
+  name: "login",
+  data() {
+    return {
+      loginForm: {
+        username: "",
+        password: ""
+      },
+      loginRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 5, max: 12, message: "长度在 5 到 12 个字符", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
+        ],
+      }
+    };
+  },
+  created() {
+    this.$request.sayHi();
+  }
 };
 </script>
 
@@ -42,13 +63,13 @@ body {
       border-radius: 10px;
       padding: 40px 35px;
       box-sizing: border-box;
-      .btnLogin{
-          width: 100%;
+      .btnLogin {
+        width: 100%;
       }
-      h2{
-          margin: 0;
-          padding: 0;
-          text-align: center;
+      h2 {
+        margin: 0;
+        padding: 0;
+        text-align: center;
       }
     }
   }
