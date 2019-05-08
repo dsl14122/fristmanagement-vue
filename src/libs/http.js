@@ -1,12 +1,12 @@
 
 // 导入 axios
-// import axios from 'axios'
+import axios from 'axios'
 
+axios.defaults.baseURL='http://localhost:8888/api/private/v1/'
 //抽取网络请求的对象
 const request={
-    sayHi(){
-      console.log('你好');
- 
+    login(params){
+        return axios.post('login',params)
     }
 }
 
