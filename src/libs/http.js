@@ -7,6 +7,15 @@ axios.defaults.baseURL='http://localhost:8888/api/private/v1/'
 const request={
     login(params){
         return axios.post('login',params)
+    },
+    //获取用户
+    getusers(params){
+        return axios.get('users',{
+            params,
+            headers:{
+                Authorization:window.sessionStorage.getItem('token')
+            }
+        })
     }
 }
 

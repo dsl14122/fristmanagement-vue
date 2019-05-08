@@ -34,35 +34,52 @@
       :page-sizes="[2, 4, 7, 9]"
       :page-size="3"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="50">
-    </el-pagination>
+      :total="50"
+    ></el-pagination>
   </div>
 </template>
 
 <script>
 export default {
   name: "users",
-   data() {
-      return {
-        tableData: [{
-          date: '1',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '3',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '4',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }]
+  data() {
+    return {
+      tableData: [
+        {
+          date: "1",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          date: "2",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1517 弄"
+        },
+        {
+          date: "3",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1519 弄"
+        },
+        {
+          date: "4",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1516 弄"
+        }
+      ],
+      userData:{
+        query:"",
+        pagenum:1,
+        pagesize:10
       }
-    }
+    };
+  },
+  // 调用接口
+  created() {
+    this.$request.getusers(this.userData).then(res=>{
+      console.log(res);
+      
+    });
+  }
 };
 </script>
 
