@@ -20,12 +20,23 @@
     <!-- 表格 -->
     <template>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="date" label="#" width="30"></el-table-column>
-        <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-        <el-table-column prop="address" label="邮箱" width="180"></el-table-column>
-        <el-table-column prop="name" label="电话" width="180"></el-table-column>
-        <el-table-column prop="name" label="用户状态" width="180"></el-table-column>
-        <el-table-column prop="address" label="操作"></el-table-column>
+        <el-table-column type="index" width="50"></el-table-column>
+        <el-table-column prop="role_name" label="姓名" width="180"></el-table-column>
+        <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+        <el-table-column prop="mobile" label="电话" width="180"></el-table-column>
+        <el-table-column prop="mg_state" label="用户状态" width="180">
+          <template slot-scope="scope">
+          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="操作">
+          
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" size='mini' plain></el-button>
+            <el-button type="success" icon="el-icon-check" size='mini' plain></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)" size='mini' plain></el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </template>
     <!-- 分页 -->
@@ -66,18 +77,27 @@ export default {
           address: "上海市普陀区金沙江路 1516 弄"
         }
       ],
-      userData:{
-        query:"",
-        pagenum:1,
-        pagesize:10
+      userData: {
+        query: "",
+        pagenum: 1,
+        pagesize: 10
       }
     };
   },
+  methods: {
+    handleEdit(index,row){
+    console.log(row);
+
+    },
+    handleDelete(index,row){
+     console.log(row);
+    }
+  },
   // 调用接口
   created() {
-    this.$request.getusers(this.userData).then(res=>{
-      console.log(res);
-      
+    this.$request.getusers(this.userData).then(res => {
+      // console.log(res);
+      this.tableData = res.data.data.users;
     });
   }
 };
