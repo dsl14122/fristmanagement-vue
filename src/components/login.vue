@@ -10,7 +10,7 @@
           <el-input v-model="loginForm.password" type="password"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="btnLogin" type="primary" @click="submitForm('loginForm')">登 录</el-button>
+          <el-button class="btnLogin" type="primary" @click="submitForm('loginForm')" >登 录</el-button>
           <el-button class="btnReset" type="danger" @click="resetForm('loginForm')">重 置</el-button>
         </el-form-item>
       </el-form>
@@ -30,11 +30,11 @@ export default {
       loginRules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 5, max: 12, message: "长度在 5 到 12 个字符", trigger: "blur" }
+          { min: 5, max: 12, message: "长度在 5 到 12 个字符", trigger: "change" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
+          { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "change" }
         ]
       }
     };
@@ -50,7 +50,8 @@ export default {
               this.$message.warning(res.data.meta.msg)
             }else if(res.data.meta.status==200){
               this.$message.success(res.data.meta.msg)
-              // 跳转
+              window.sessionStorage.setItem('token',res.data.data.token)
+              // 编程式导航
               this.$router.push('/')
             }else{
               alert('404Not Found')

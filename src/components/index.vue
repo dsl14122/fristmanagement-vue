@@ -12,7 +12,7 @@
         </el-col>
         <el-col :span="1">
           <div class="grid-content bg-purple">
-            <el-button type="danger" class="logout" icon="el-icon-delete" circle></el-button>
+            <el-button type="danger" class="logout" icon="el-icon-delete" circle @click="logout"></el-button>
           </div>
         </el-col>
       </el-row>
@@ -69,7 +69,21 @@
 
 <script>
 export default {
-  name: "index"
+  name: "index",
+  beforeCreate() {
+    if(!window.sessionStorage.getItem('token')){
+       this.$message.error('你倒是去登录一下呀!')
+      //  编程式导航
+     this.$router.push('login')
+    }
+  },
+  methods: {
+    logout(){
+      window.sessionStorage.removeItem('token')
+      //  编程式导航
+     this.$router.push('login')
+    }
+  },
 };
 </script>
 

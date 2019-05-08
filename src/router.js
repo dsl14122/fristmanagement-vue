@@ -21,6 +21,7 @@ import reports from "./components/reports.vue"
 const routes=[
     {path:'/login',component:login},
     {path:'/',component:index,children:[
+        {path:"",redirect:'users'},
         {path:"users",component:users},
         {path:"roles",component:roles},
         {path:"rights",component:rights},
