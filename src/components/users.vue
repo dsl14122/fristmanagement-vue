@@ -9,7 +9,12 @@
     <!-- 输入搜索框 -->
     <el-row>
       <el-col :span="8">
-        <el-input placeholder="请输入内容" @keyup.native.enter="getusers"  v-model="userData.query" class="input-with-select">
+        <el-input
+          placeholder="请输入内容"
+          @keyup.native.enter="getusers"
+          v-model="userData.query"
+          class="input-with-select"
+        >
           <el-button slot="append" icon="el-icon-search" @click="getusers"></el-button>
         </el-input>
       </el-col>
@@ -43,7 +48,13 @@
               size="mini"
               plain
             ></el-button>
-            <el-button type="success" icon="el-icon-check" size="mini" plain></el-button>
+            <el-button
+              type="success"
+              icon="el-icon-check"
+              @click="handleRole(scope.row)"
+              size="mini"
+              plain
+            ></el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
@@ -62,8 +73,8 @@
       :page-size="userData.pagesize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
-      @size-change='sizeChange'
-      @current-change='currentChange'
+      @size-change="sizeChange"
+      @current-change="currentChange"
     ></el-pagination>
     <!-- 增加用户弹框 -->
     <el-dialog title="添加用户" :visible.sync="addVisible">
@@ -91,10 +102,10 @@
     <el-dialog title="修改用户" :visible.sync="editVisible">
       <el-form :model="editForm" :rules="addRules" ref="editForm">
         <el-form-item label="用户名" label-width="120px" prop="username">
-          <el-input v-model="editForm.username" autocomplete="off"disabled></el-input>
+          <el-input v-model="editForm.username" autocomplete="off" disabled></el-input>
         </el-form-item>
         <el-form-item label="邮箱" label-width="120px">
-          <el-input v-model="editForm.email" autocomplete="off" ></el-input>
+          <el-input v-model="editForm.email" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="电话" label-width="120px">
           <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
@@ -105,9 +116,29 @@
         <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
       </div>
     </el-dialog>
-
-
-
+    <!-- 用户角色弹框 -->
+    <el-dialog title="用户角色" :visible.sync="roleVisible">
+      <el-form :model="roleForm" :rules="addRules" ref="roleForm">
+        <el-form-item label="用户名" label-width="120px" prop="username">
+          <el-input v-model="roleForm.username" autocomplete="off" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="请选择角色" label-width="120px">
+          <el-select v-model="roleValue" placeholder="请选择">
+            <el-option label="未分配角色" :value="-1"></el-option>
+            <el-option
+              v-for="item in roles"
+              :key="item.value"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="roleVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('roleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -121,7 +152,7 @@ export default {
       editVisible: false,
 
       //总页数条数
-      total:0,
+      total: 0,
       tableData: [
         {
           date: "1",
@@ -165,50 +196,56 @@ export default {
         email: "",
         mobile: ""
       },
-      editForm:{
+      editForm: {
         username: "",
         email: "",
         mobile: ""
-      }
+      },
+      //  角色弹框
+      roleVisible: false,
+      // 角色数据
+      roleForm: {},
+      // 所有的角色
+      roles: [],
+      // select的双向数据绑定
+      roleValue: ""
     };
   },
   methods: {
     handleEdit(index, row) {
       // console.log(row);
-       this.$request.getuserbyid(row.id).then(res=>{
-          //数据获取
-          this.editForm=res.data.data
-          // 弹框
-          this.editVisible=true
-       })
+      this.$request.getuserbyid(row.id).then(res => {
+        //数据获取
+        this.editForm = res.data.data;
+        // 弹框
+        this.editVisible = true;
+      });
     },
     //删除用户
     handleDelete(index, row) {
       // console.log(row);
       //弹框确认
-        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '干了它',
-          cancelButtonText: '算了吧',
-          type: 'warning'
-        }).then(() => {
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "干了它",
+        cancelButtonText: "算了吧",
+        type: "warning"
+      })
+        .then(() => {
           // 调用接口
-          this.$request.deleteUsers(row.id).then(res=>{
-              // console.log(res);
-              // 重新获取数据
+          this.$request.deleteUsers(row.id).then(res => {
+            // console.log(res);
+            // 重新获取数据
             if (res.data.meta.status == 200) {
-               this.getusers();
+              this.getusers();
             }
-            })
-        }).catch(() => {
+          });
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '算了算了，不干它了'
-          });          
+            type: "info",
+            message: "算了算了，不干它了"
+          });
         });
-
-
-
-      
     },
     //更改状态
     stateChange(row) {
@@ -223,26 +260,39 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           // 数据正确
-        if(formName=='editForm'){
-          this.$request.updateUser(this.editForm).then(res=>{
-             if(res.data.meta.status==200){
-               //重新获取数据
-               this.getusers()
-              //  关闭弹框
-              this.editVisible=false;
-             }
-          })
-        }
+          if (formName == "editForm") {
+            this.$request.updateUser(this.editForm).then(res => {
+              if (res.data.meta.status == 200) {
+                //重新获取数据
+                this.getusers();
+                //  关闭弹框
+                this.editVisible = false;
+              }
+            });
+          }else if(formName == "roleForm"){
+               this.$request.updateRoles({
+                 id:this.roleForm.id,
+                 rid:this.roleValue
+               }).then(res=>{
+                 if (res.data.meta.status == 200) {
+                  // 重新获取角色
+                  this.getusers();
+                  // 关闭角色框
+                  this.roleVisible = false;
+                }
 
-          this.$request.addUsers(this.addForm).then(res => {
-            console.log(res);
-            // 关闭弹框
-            this.addVisible = false;
-            // 重新获取数据
-            this.getusers();
-            // 重置表单
-            
-          });
+               })
+
+          }else {
+            this.$request.addUsers(this.addForm).then(res => {
+              console.log(res);
+              // 关闭弹框
+              this.addVisible = false;
+              // 重新获取数据
+              this.getusers();
+              // 重置表单
+            });
+          }
         } else {
           // 数据有误
           this.$message.error("数据格式不对！");
@@ -258,20 +308,35 @@ export default {
       this.$request.getusers(this.userData).then(res => {
         // console.log(res);
         this.tableData = res.data.data.users;
-        this.total=res.data.data.total;
+        this.total = res.data.data.total;
       });
     },
     // 每页条数
-    sizeChange(size){
+    sizeChange(size) {
       //  console.log(size);
-       this.userData.pagesize=size
-     this.getusers();
+      this.userData.pagesize = size;
+      this.getusers();
     },
     // 当前页
-    currentChange(current){
-    //  console.log(current);
-     this.userData.pagenum=current
-     this.getusers();
+    currentChange(current) {
+      //  console.log(current);
+      this.userData.pagenum = current;
+      this.getusers();
+    },
+
+    //弹出角色框
+    handleRole(row) {
+      this.$request.getuserbyid(row.id).then(res => {
+        //  保存数据
+        this.roleForm = res.data.data;
+        this.$request.getRoles().then(res => {
+          this.roles = res.data.data;
+          //弹框
+          this.roleVisible = true;
+          // 设置默认选中
+          this.roleValue = this.roleForm.rid;
+        });
+      });
     }
   },
   // 调用接口

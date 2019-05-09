@@ -60,6 +60,16 @@ const request={
             email:params.email,
             mobile:params.mobile,
         })
+    },
+    //角色列表
+    getRoles(){
+        return axios.get('roles')
+    },
+    // 分配用户角色
+    updateRoles(params){
+        return axios.put(`users/${params.id}/role`,{
+            rid:params.rid
+        })
     }
 }
 
