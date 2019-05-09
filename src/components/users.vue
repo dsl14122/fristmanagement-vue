@@ -9,8 +9,8 @@
     <!-- 输入搜索框 -->
     <el-row>
       <el-col :span="8">
-        <el-input placeholder="请输入内容" v-model="input3" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-input placeholder="请输入内容" @keyup.native.enter="getusers"  v-model="userData.query" class="input-with-select">
+          <el-button slot="append" icon="el-icon-search" @click="getusers"></el-button>
         </el-input>
       </el-col>
       <el-col :span="12">
@@ -57,11 +57,13 @@
     </template>
     <!-- 分页 -->
     <el-pagination
-      :current-page="1"
+      :current-page="userData.pagenum"
       :page-sizes="[2, 4, 7, 9]"
-      :page-size="3"
+      :page-size="userData.pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="50"
+      :total="total"
+      @size-change='sizeChange'
+      @current-change='currentChange'
     ></el-pagination>
     <!-- 增加用户弹框 -->
     <el-dialog title="添加用户" :visible.sync="addVisible">
@@ -94,6 +96,8 @@ export default {
   data() {
     return {
       addVisible: false,
+      //总页数条数
+      total:0,
       tableData: [
         {
           date: "1",
@@ -208,7 +212,20 @@ export default {
       this.$request.getusers(this.userData).then(res => {
         // console.log(res);
         this.tableData = res.data.data.users;
+        this.total=res.data.data.total;
       });
+    },
+    // 每页条数
+    sizeChange(size){
+      //  console.log(size);
+       this.userData.pagesize=size
+     this.getusers();
+    },
+    // 当前页
+    currentChange(current){
+    //  console.log(current);
+     this.userData.pagenum=current
+     this.getusers();
     }
   },
   // 调用接口
