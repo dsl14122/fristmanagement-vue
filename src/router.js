@@ -13,6 +13,7 @@ import params from "./components/params.vue"
 import categories from "./components/categories.vue"
 import orders from "./components/orders.vue"
 import reports from "./components/reports.vue"
+import error from "./components/error.vue"
 
 //写组件
  
@@ -30,11 +31,21 @@ const routes=[
         {path:"categories",component:categories},
         {path:"orders",component:orders},
         {path:"reports",component:reports},
+        {path:"error",component:error},
+
     ]},
 ]
 // 实例化路由对象
  const router = new VueRouter({
      routes
  })
+  //导航前置守卫
+ router.beforeEach((to, from, next) => {
+     if(to.matched.length==0){
+        next('error');
+     }else{
+         next();
+     }
+  })
 // 暴露路由
 export default router
