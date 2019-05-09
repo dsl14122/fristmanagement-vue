@@ -180,6 +180,7 @@ export default {
         pagenum: 1,
         pagesize: 10
       },
+
       addRules: {
         username: [
           { required: true, message: "用户名不为空", trigger: "blur" },
@@ -196,6 +197,7 @@ export default {
         email: "",
         mobile: ""
       },
+      
       editForm: {
         username: "",
         email: "",
