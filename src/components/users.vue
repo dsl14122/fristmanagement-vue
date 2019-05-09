@@ -86,6 +86,28 @@
         <el-button type="primary" @click="submitForm('addForm')">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 修改用户弹框 -->
+    <el-dialog title="修改用户" :visible.sync="editVisible">
+      <el-form :model="editForm" :rules="addRules" ref="editForm">
+        <el-form-item label="用户名" label-width="120px" prop="username">
+          <el-input v-model="editForm.username" autocomplete="off"disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" label-width="120px">
+          <el-input v-model="editForm.email" autocomplete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="电话" label-width="120px">
+          <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
+
   </div>
 </template>
 
@@ -96,6 +118,8 @@ export default {
   data() {
     return {
       addVisible: false,
+      editVisible: false,
+
       //总页数条数
       total:0,
       tableData: [
@@ -140,12 +164,23 @@ export default {
         password: "",
         email: "",
         mobile: ""
+      },
+      editForm:{
+        username: "",
+        email: "",
+        mobile: ""
       }
     };
   },
   methods: {
     handleEdit(index, row) {
       // console.log(row);
+       this.$request.getuserbyid(row.id).then(res=>{
+          //数据获取
+          this.editForm=res.data.data
+          // 弹框
+          this.editVisible=true
+       })
     },
     //删除用户
     handleDelete(index, row) {
@@ -188,6 +223,17 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           // 数据正确
+        if(formName=='editForm'){
+          this.$request.updateUser(this.editForm).then(res=>{
+             if(res.data.meta.status==200){
+               //重新获取数据
+               this.getusers()
+              //  关闭弹框
+              this.editVisible=false;
+             }
+          })
+        }
+
           this.$request.addUsers(this.addForm).then(res => {
             console.log(res);
             // 关闭弹框

@@ -49,6 +49,17 @@ const request={
     //删除用户
     deleteUsers(id){
         return axios.delete(`users/${id}`)
+    },
+    //根据id获取用户信息
+    getuserbyid(id){
+        return axios.get(`users/${id}`)
+    },
+    //修改用户信息
+    updateUser(params){
+        return  axios.put(`users/${params.id}`,{
+            email:params.email,
+            mobile:params.mobile,
+        })
     }
 }
 
