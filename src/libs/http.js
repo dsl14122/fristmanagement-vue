@@ -97,7 +97,13 @@ const request={
     // 编辑提交角色
     editRoles(params){
          return axios.put(`roles/${params.id}`,params)
+    },
+
+    // 权限列表
+    getRights(){
+        return axios.get('rights/list')
     }
+
 }
 
 // 暴露出去 包含install方法的对象
