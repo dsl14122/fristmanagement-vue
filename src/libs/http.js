@@ -27,6 +27,7 @@ axios.interceptors.response.use(function (response) {
         router.push('login')
         //删除token
         window.sessionStorage.removeItem('token')
+        response.data.data=[]
     }
     
     return response;
@@ -40,6 +41,7 @@ const request={
     login(params){
         return axios.post('login',params)
     },
+
     //获取用户
     getusers(params){
         return axios.get('users',{
@@ -69,6 +71,7 @@ const request={
             mobile:params.mobile,
         })
     },
+
     //角色列表
     getRoles(){
         return axios.get('roles')
@@ -82,6 +85,18 @@ const request={
     //添加角色
     addRoles(params){
       return axios.post('roles',params)
+    },
+    //删除角色
+    deleteRoles(id){
+        return  axios.delete(`roles/${id}`)
+    },
+    //根据ID查询角色
+    selectRolesById(id){
+        return axios.get(`roles/${id}`)
+    },
+    // 编辑提交角色
+    editRoles(params){
+         return axios.put(`roles/${params.id}`,params)
     }
 }
 

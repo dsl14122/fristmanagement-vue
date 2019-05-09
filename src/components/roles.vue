@@ -24,7 +24,7 @@
             <el-button
               type="primary"
               icon="el-icon-edit"
-              @click="handleEdit(scope.$index, scope.row)"
+              @click="handleEdit(scope.row)"
               size="mini"
               plain
             ></el-button>
@@ -38,7 +38,7 @@
             <el-button
               type="danger"
               icon="el-icon-delete"
-              @click="handleDelete(scope.$index, scope.row)"
+              @click="handleDelete(scope.row)"
               size="mini"
               plain
             ></el-button>
@@ -46,7 +46,7 @@
         </el-table-column>
       </el-table>
     </template>
-    <!-- 增加用户弹框 -->
+    <!-- 增加角色弹框 -->
     <el-dialog title="添加角色" :visible.sync="addVisible">
       <el-form :model="addForm" :rules="addRules" ref="addForm">
         <el-form-item label="角色名称" label-width="120px" prop="roleName">
@@ -59,6 +59,21 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitForm('addForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 修改角色弹框 -->
+    <el-dialog title="编辑角色" :visible.sync="editVisible">
+      <el-form :model="editForm" :rules="editRules" ref="editForm">
+        <el-form-item label="角色名称" label-width="120px" prop="roleName">
+          <el-input v-model="editForm.roleName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" label-width="120px" prop="roleDesc">
+          <el-input v-model="editForm.roleDesc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -96,7 +111,7 @@ export default {
       addRules: {
         roleName: [
           { required: true, message: "角色名称不为空", trigger: "blur" },
-          { min: 5, max: 10, message: "长度在 5 到 10 个字符", trigger: "blur" }
+          { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
         ],
         roleDesc: [
           { required: true, message: "角色描述不为空", trigger: "blur" },
@@ -106,22 +121,73 @@ export default {
       addForm: {
         roleName: "",
         roleDesc: "",
-      }
+      },
+
+      //  编辑角色
+      editVisible: false,
+      editRules: {
+        roleName: [
+          { required: true, message: "角色名称不为空", trigger: "blur" },
+          { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
+        ],
+        roleDesc: [
+          { required: true, message: "角色描述不为空", trigger: "blur" },
+          { min: 0, max: 12, message: "长度在 0 到 12 个字符", trigger: "blur" }
+        ]
+      },
+      editForm: {
+        roleName: "",
+        roleDesc: "",
+      },
+
+
     };
   },
   created() {
     this.getRoles();
   },
   methods: {
-    
-    handleEdit() {},
+    //角色编辑
+    handleEdit(row) {
+        this.editVisible=true;
+        // console.log(row);
+        this.$request.selectRolesById(row.id).then(res=>{
+            // console.log(res);
+            // 获取数据
+             this.editForm=res.data.data
+        })
+
+    },
     //角色添加
     handleRole(row) {
       // console.log(row);
       
         // this.$request
     },
-    handleDelete() {},
+    // 弹框删除事件
+    handleDelete(row) {
+      console.log(row);
+      //弹框提示
+       this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+             this.$request.deleteRoles(row.id).then(res=>{
+                console.log(res);
+                if(res.data.meta.status==200){
+                 this.getRoles();
+                }
+
+             })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+       
+    },
 
     //数据渲染
     getRoles() {
@@ -143,12 +209,15 @@ export default {
         if (valid) {
           // 数据正确
           if (formName == "editForm") {
-            this.$request.updateUser(this.editForm).then(res => {
+            this.editForm.id = this.editForm.roleId;
+            this.$request.editRoles(this.editForm).then(res => {
+              // console.log(res);
               if (res.data.meta.status == 200) {
                 //重新获取数据
-                this.getusers();
+                this.getRoles();
                 //  关闭弹框
                 this.editVisible = false;
+                this.$refs[formName].resetFields();
               }
             });
           } else if (formName == "roleForm") {
@@ -163,6 +232,7 @@ export default {
                   this.getusers();
                   // 关闭角色框
                   this.roleVisible = false;
+                 
                 }
               });
           } else {
@@ -173,6 +243,7 @@ export default {
               // 重新获取数据
               this.getRoles();
               // 重置表单
+              this.$refs[formName].resetFields();
             });
           }
         } else {
