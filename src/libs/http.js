@@ -2,6 +2,8 @@
 // 导入 axios
 import axios from 'axios'
 import Vue from 'vue'
+// 导入路由对象
+import router from '../router'
 axios.defaults.baseURL='http://localhost:8888/api/private/v1/'
 
 // 添加一个请求拦截器
@@ -19,6 +21,12 @@ axios.interceptors.response.use(function (response) {
     // console.log(response);
     if(response.data.meta.status==200){
         Vue.prototype.$message.success(response.data.meta.msg)
+    }else if(response.data.meta.status==400&& response.data.meta.msg=='无效token'){
+        new Vue().$message.warning('git警告,再伪造token，删了你的库！')
+        // 编程式导航
+        router.push('login')
+        //删除token
+        window.sessionStorage.removeItem('token')
     }
     
     return response;
