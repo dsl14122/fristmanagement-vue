@@ -98,10 +98,12 @@ const request={
     editRoles(params){
          return axios.put(`roles/${params.id}`,params)
     },
-
     // 权限列表
     getRights(){
         return axios.get('rights/list')
+    },
+    getReports(){
+        return axios.get('reports/type/1')
     }
 
 }
