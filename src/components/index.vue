@@ -20,48 +20,20 @@
     <el-container>
       <el-aside width="200px" class="indexLeft">
         <el-menu router default-active="2" class="el-menu-vertical-demo">
-          <el-submenu index="1">
+          <el-submenu :index="item1.order" v-for="(item1, index) in menus" :key="index">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{item1.authName}}</span>
             </template>
-              <el-menu-item index="users"> <i class="el-icon-menu"></i>用户列表</el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>权限管理</span>
-            </template>
-              <el-menu-item index="roles"> <i class="el-icon-menu"></i>角色列表</el-menu-item>
-              <el-menu-item index="rights"> <i class="el-icon-menu"></i>权限列表</el-menu-item>
-          </el-submenu>
-          <el-submenu index="3">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>商品管理</span>
-            </template>
-              <el-menu-item index="goods"> <i class="el-icon-menu"></i>商品列表</el-menu-item>
-              <el-menu-item index="params"> <i class="el-icon-menu"></i>分类参数</el-menu-item>
-              <el-menu-item index="categories"> <i class="el-icon-menu"></i>商品分类</el-menu-item>
-          </el-submenu>
-          <el-submenu index="4">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>订单管理</span>
-            </template>
-              <el-menu-item index="orders"> <i class="el-icon-menu"></i>订单列表</el-menu-item>
-          </el-submenu>
-          <el-submenu index="5">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>数据统计</span>
-            </template>
-              <el-menu-item index="reports"> <i class="el-icon-menu"></i>数据报表</el-menu-item>
+            <el-menu-item :index="item2.path" v-for="(item2, i) in item1.children" :key="i">
+              <i class="el-icon-menu"></i>
+              {{item2.authName}}
+            </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
       <el-main class="indexRight">
-          <router-view></router-view>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -70,20 +42,31 @@
 <script>
 export default {
   name: "index",
+  data() {
+    return {
+      menus: []
+    };
+  },
   beforeCreate() {
-    if(!window.sessionStorage.getItem('token')){
-       this.$message.error('你倒是去登录一下呀!')
+    if (!window.sessionStorage.getItem("token")) {
+      this.$message.error("你倒是去登录一下呀!");
       //  编程式导航
-     this.$router.push('login')
+      this.$router.push("login");
     }
   },
   methods: {
-    logout(){
-      window.sessionStorage.removeItem('token')
+    logout() {
+      window.sessionStorage.removeItem("token");
       //  编程式导航
-     this.$router.push('login')
+      this.$router.push("login");
     }
   },
+  created() {
+    this.$request.getMenus().then(res => {
+      console.log(res);
+      this.menus = res.data.data;
+    });
+  }
 };
 </script>
 
@@ -112,7 +95,7 @@ export default {
   .indexLeft {
   }
   .indexRight {
-      padding-top: 0;
+    padding-top: 0;
     background-color: #e9eef3;
   }
 }
