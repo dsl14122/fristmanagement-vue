@@ -112,7 +112,14 @@ const request={
             params
         })
     },
-
+    // 删除角色指定权限
+    deleteRight(params){
+       return axios.delete(`roles/${params.roleId}/rights/${params.rightId}`) 
+    },
+    // 权限属性列表
+    getTreeRights(){
+        return axios.get('rights/tree')
+    },
 }
 
 // 暴露出去 包含install方法的对象

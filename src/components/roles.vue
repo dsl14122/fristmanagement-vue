@@ -9,13 +9,39 @@
     <!-- 输入搜索框 -->
     <el-row>
       <el-col :span="24">
-        <el-button type="success" @click='addVisible=true' plain>添加角色</el-button>
+        <el-button type="success" @click="addVisible=true" plain>添加角色</el-button>
       </el-col>
     </el-row>
     <!-- 表格 -->
     <template>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop label=" " width="30"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="props">
+            <!-- 第一层 -->
+            <el-row v-for="(item1,index) in props.row._children" :key="index">
+              <el-col :span="6">
+             <el-tag  :key="item1.id" @close="delRights(props.row,item1.id)" closable type="primary">{{item1.authName}}</el-tag>
+             <span class="el-icon-arrow-right"></span>
+              </el-col>
+              <el-col :span="18">
+                <!-- 第二层 -->
+               <el-row v-for="(item2,i) in item1.children" :key="i">
+              <el-col :span="6">
+             <el-tag  :key="item2.id" @close="delRights(props.row,item2.id)" closable type="success">{{item2.authName}}</el-tag>
+             <span class="el-icon-arrow-right"></span>
+              </el-col>
+              <el-col :span="18">
+               <!-- 第三层 -->
+              <el-tag  class="my-tag" v-for="(item3,j) in item2.children" :key="item3.id" @close="delRights(props.row,item3.id)" closable type="warning">{{item3.authName}}</el-tag>
+              </el-col>
+              </el-row>
+
+              </el-col>
+            </el-row>
+          
+          </template>
+        </el-table-column>
+
         <el-table-column type="index" width="50"></el-table-column>
         <el-table-column prop="roleName" label="角色名称" width="180"></el-table-column>
         <el-table-column prop="roleDesc" label="角色描述" width="180"></el-table-column>
@@ -76,6 +102,16 @@
         <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 权限弹框 -->
+    <el-dialog title="分配权限" :visible.sync="rightsVisible">
+      <el-tree :data="rightsData" :props="rightsProps" show-checkbox default-expand-all node-key="id"  :default-checked-keys="defaultCheckedKeys" >
+
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="rightsVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -120,7 +156,7 @@ export default {
       },
       addForm: {
         roleName: "",
-        roleDesc: "",
+        roleDesc: ""
       },
 
       //  编辑角色
@@ -137,9 +173,17 @@ export default {
       },
       editForm: {
         roleName: "",
-        roleDesc: "",
+        roleDesc: ""
       },
-
+      //权限分配
+      rightsVisible: false,
+      rightsData:[],
+      rightsProps: {
+          children: 'children',
+          label: 'authName'
+        },
+        //默认选中权限
+       defaultCheckedKeys:[],
 
     };
   },
@@ -149,44 +193,62 @@ export default {
   methods: {
     //角色编辑
     handleEdit(row) {
-        this.editVisible=true;
-        // console.log(row);
-        this.$request.selectRolesById(row.id).then(res=>{
-            // console.log(res);
-            // 获取数据
-             this.editForm=res.data.data
-        })
-
+      this.editVisible = true;
+      // console.log(row);
+      this.$request.selectRolesById(row.id).then(res => {
+        // console.log(res);
+        // 获取数据
+        this.editForm = res.data.data;
+      });
     },
-    //角色添加
+    //分配角色
     handleRole(row) {
       // console.log(row);
-      
-        // this.$request
+       this.rightsVisible=true;
+       this.$request.getTreeRights().then(res=>{
+         console.log(res);
+          this.rightsData=res.data.data;
+          let checkedIds=[]
+          function getCheckedKeys(item){
+            // 查找后代的children 如果有 就遍历 并且 添加到数组中
+            item._children.forEach(v=>{
+              checkedIds.push(v.id)
+              if(v.children){
+                v._children=v.children
+                getCheckedKeys(v)
+              }
+            })
+          }
+          getCheckedKeys(row)
+         // 设置到data中
+         this.defaultCheckedKeys=checkedIds
+
+       })
+
     },
     // 弹框删除事件
     handleDelete(row) {
       console.log(row);
       //弹框提示
-       this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-             this.$request.deleteRoles(row.id).then(res=>{
-                console.log(res);
-                if(res.data.meta.status==200){
-                 this.getRoles();
-                }
-
-             })
-        }).catch(() => {
+      this.$confirm("此操作将永久删除该信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$request.deleteRoles(row.id).then(res => {
+            console.log(res);
+            if (res.data.meta.status == 200) {
+              this.getRoles();
+            }
+          });
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+            type: "info",
+            message: "已取消删除"
+          });
         });
-       
     },
 
     //数据渲染
@@ -232,7 +294,6 @@ export default {
                   this.getusers();
                   // 关闭角色框
                   this.roleVisible = false;
-                 
                 }
               });
           } else {
@@ -252,6 +313,15 @@ export default {
           return false;
         }
       });
+    },
+    // 删除权限
+    delRights(row,rightId){
+       this.$request.deleteRight({
+         roleId:row.id,
+         rightId
+       }).then(res=>{
+          row._children=res.data.data
+       })
     }
   }
 };
@@ -265,6 +335,10 @@ export default {
     line-height: 45px;
     font-size: 15px;
     padding-left: 10px;
+  }
+  .my-tag{
+    margin-right: 5px;
+    margin-bottom: 5px;
   }
 }
 </style>
