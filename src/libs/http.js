@@ -102,9 +102,16 @@ const request={
     getRights(){
         return axios.get('rights/list')
     },
+    //数据统计
     getReports(){
         return axios.get('reports/type/1')
-    }
+    },
+    // 订单数据列表
+    getOrders(params){
+        return axios.get('orders',{
+            params
+        })
+    },
 
 }
 
