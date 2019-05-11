@@ -69,7 +69,7 @@
     <!-- 分页 -->
     <el-pagination
       :current-page="userData.pagenum"
-      :page-sizes="[2, 4, 7, 9]"
+      :page-sizes="[2, 4, 7, 10]"
       :page-size="userData.pagesize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
