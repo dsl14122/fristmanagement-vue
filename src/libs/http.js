@@ -120,6 +120,12 @@ const request={
     getTreeRights(){
         return axios.get('rights/tree')
     },
+    // 角色授权
+    setRolerights(params){
+      return axios.post(`roles/${params.roleId}/rights`,{
+          rids:params.rids
+      })
+    }
 }
 
 // 暴露出去 包含install方法的对象

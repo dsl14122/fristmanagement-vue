@@ -104,12 +104,12 @@
     </el-dialog>
     <!-- 权限弹框 -->
     <el-dialog title="分配权限" :visible.sync="rightsVisible">
-      <el-tree :data="rightsData" :props="rightsProps" show-checkbox default-expand-all node-key="id"  :default-checked-keys="defaultCheckedKeys" >
+      <el-tree :data="rightsData" :props="rightsProps" show-checkbox default-expand-all node-key="id" ref="tree"  :default-checked-keys="defaultCheckedKeys" >
 
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="rightsVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="setRolerights">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -177,6 +177,9 @@ export default {
       },
       //权限分配
       rightsVisible: false,
+      rightsForm:{
+
+      },
       rightsData:[],
       rightsProps: {
           children: 'children',
@@ -205,6 +208,7 @@ export default {
     handleRole(row) {
       // console.log(row);
        this.rightsVisible=true;
+       this.rightsForm=row;
        this.$request.getTreeRights().then(res=>{
          console.log(res);
           this.rightsData=res.data.data;
@@ -322,6 +326,22 @@ export default {
        }).then(res=>{
           row._children=res.data.data
        })
+    },
+    // 角色授权
+    setRolerights(){
+      // join方法 把数组 按照传入的值 拼接起来
+      const rids= this.$refs.tree.getCheckedKeys().join(",")
+       this.$request.setRolerights({
+         roleId:this.rightsForm.id,
+         rids
+       }).then(res=>{
+           console.log(res);
+           if(res.data.meta.status=="200"){
+               this.rightsVisible = false;
+               this.getRoles();
+           }
+       })
+        
     }
   }
 };
