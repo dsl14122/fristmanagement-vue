@@ -7,41 +7,69 @@
       <el-breadcrumb-item>分类参数</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 警告栏 -->
-    <el-alert class="alert" title="注意：只允许为第三级分类设置相关参数！" type="warning" show-icon>
-    </el-alert>
-     <!-- 级联 -->
-     <div class="jilian">
-         <span>请选择商品分类：</span>&nbsp;&nbsp;
-      <el-cascader expand-trigger="hover" :options="options"></el-cascader>
-     </div>
-     <!-- tabs 标签页 -->
-     <el-tabs v-model="activeName" >
-    <el-tab-pane label="动态参数" name="first">
-        <el-button size='small' class="btn" type="primary" disabled>添加动态参数</el-button>
+    <el-alert class="alert" title="注意：只允许为第三级分类设置相关参数！" type="warning" show-icon></el-alert>
+    <!-- 级联 -->
+    <div class="jilian">
+      <span>请选择商品分类：</span>&nbsp;&nbsp;
+      <el-cascader :props="props" @change="change" expand-trigger="hover" :options="options"></el-cascader>
+    </div>
+    <!-- tabs 标签页 -->
+    <el-tabs v-model="activeName">
+      <el-tab-pane label="动态参数" name="first">
+        <el-button size="small" class="btn" type="primary" disabled>添加动态参数</el-button>
         <!-- 表格 -->
-     <template>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="date" label=" " width="30"></el-table-column>
-        <el-table-column prop="date" label="#" width="30"></el-table-column>
-        <el-table-column prop="name" label="商品参数" width="180"></el-table-column>
-        <el-table-column prop="address" label="操作"></el-table-column>
-      </el-table>
-    </template>
-    </el-tab-pane>
-    <el-tab-pane label="静态参数" name="second">
-        <el-button  size='small' class="btn" type="primary" disabled>添加静态参数</el-button>
+        <template>
+          <el-table :data="dynameicTable" border style="width: 100%">
+            <el-table-column prop="date" label=" " width="50"></el-table-column>
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column prop="attr_name" label="商品参数" width="180"></el-table-column>
+            <el-table-column prop="address" label="操作">
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+
+                size="mini"
+                plain
+              ></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+
+                size="mini"
+                plain
+              ></el-button>
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-tab-pane>
+      <el-tab-pane label="静态参数" name="second">
+        <el-button size="small" class="btn" type="primary" disabled>添加静态参数</el-button>
         <!-- 表格 -->
-     <template>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="date" label="#" width="30"></el-table-column>
-        <el-table-column prop="date" label="属性名称 " width="150"></el-table-column>
-        <el-table-column prop="name" label="属性值" width="180"></el-table-column>
-        <el-table-column prop="address" label="操作"></el-table-column>
-      </el-table>
-    </template>
-    </el-tab-pane>
-  
-     </el-tabs>
+        <template>
+          <el-table :data="staticTable" border style="width: 100%">
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column prop="attr_name" label="属性名称 " width="200"></el-table-column>
+            <el-table-column prop="attr_vals" label="属性值" width="300"></el-table-column>
+            <el-table-column prop label="操作">
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+               
+                size="mini"
+                plain
+              ></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+               
+                size="mini"
+                plain
+              ></el-button>
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
@@ -50,10 +78,8 @@ export default {
   name: "params",
   data() {
     return {
-      activeName: 'second',
-      tableData: [{
-         
-      }],
+      activeName: "second",
+      tableData: [{}],
       options: [
         {
           value: "zhinan",
@@ -322,8 +348,39 @@ export default {
           ]
         }
       ],
-
+      // 级联选择器的对应关系
+      props: {
+        value: "cat_id",
+        label: "cat_name",
+        children: "children"
+      },
+      // 静态数据
+      staticTable: [],
+      // 动态数据
+      dynameicTable: []
     };
+  },
+  created() {
+    this.$request.getCategories().then(res => {
+      console.log(res);
+      this.options = res.data.data;
+    });
+  },
+  methods: {
+    change(value) {
+      if (value.length == 3) {
+        const id = value[2];
+
+        this.$request.getStatic(id).then(res => {
+          // console.log(res);
+          this.staticTable = res.data.data;
+        });
+        this.$request.getDynamic(id).then(res => {
+          console.log(res);
+          this.dynameicTable = res.data.data;
+        });
+      }
+    }
   }
 };
 </script>
@@ -337,13 +394,13 @@ export default {
     font-size: 15px;
     padding-left: 10px;
   }
-  .alert{
-       margin-top: 20px;
+  .alert {
+    margin-top: 20px;
   }
-  .jilian{
+  .jilian {
     margin: 20px 0;
   }
-  .btn{
+  .btn {
     margin-bottom: 20px;
   }
 }

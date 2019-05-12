@@ -136,13 +136,18 @@ const request={
             params
         })
     },
-
-    
-
     //商品分类列表
     getCategories(){
         return axios.get(`categories?type=3`)
     },
+    //静态数据
+    getStatic(id){
+        return axios.get(`categories/${id}/attributes?sel=only`)
+    },
+    // 动态数据
+    getDynamic(id){
+        return axios.get(`categories/${id}/attributes?sel=many`)
+    }
 }
 
 // 暴露出去 包含install方法的对象
