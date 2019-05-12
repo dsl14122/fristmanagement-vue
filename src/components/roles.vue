@@ -339,7 +339,12 @@ export default {
            if(res.data.meta.status=="200"){
                this.rightsVisible = false;
                this.getRoles();
+
            }
+          //  重新获取菜单数据并保存到vuex中
+           this.$request.getMenus().then(res=>{
+             this.$store.commit("changeMenuList",res.data.data)
+           })
        })
         
     }

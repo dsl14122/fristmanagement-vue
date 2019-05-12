@@ -20,12 +20,12 @@
     <el-container>
       <el-aside width="200px" class="indexLeft">
         <el-menu router default-active="2" class="el-menu-vertical-demo">
-          <el-submenu :index="item1.order" v-for="(item1, index) in menus" :key="index">
+          <el-submenu :index="item1.order+''" v-for="(item1, index) in $store.state.menuList" :key="index">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>{{item1.authName}}</span>
             </template>
-            <el-menu-item :index="item2.path" v-for="(item2, i) in item1.children" :key="i">
+            <el-menu-item :index="item2.path+''" v-for="(item2, i) in item1.children" :key="i">
               <i class="el-icon-menu"></i>
               {{item2.authName}}
             </el-menu-item>
@@ -64,7 +64,8 @@ export default {
   created() {
     this.$request.getMenus().then(res => {
       console.log(res);
-      this.menus = res.data.data;
+      // this.menus = res.data.data;
+      this.$store.commit("changeMenuList",res.data.data)
     });
   }
 };

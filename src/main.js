@@ -14,8 +14,11 @@ import request from "./libs/http"
 Vue.use(request)
 
 Vue.config.productionTip = false
+// 导入仓库文件
+import store from "./store"
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount('#app')
