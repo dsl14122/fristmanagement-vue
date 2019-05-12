@@ -14,6 +14,8 @@ import categories from "./components/categories.vue"
 import orders from "./components/orders.vue"
 import reports from "./components/reports.vue"
 import error from "./components/error.vue"
+import goodsList from "./components/goodsList.vue"
+import goodsAdd from "./components/goodsAdd.vue"
 
 //写组件
  
@@ -26,7 +28,15 @@ const routes=[
         {path:"users",component:users},
         {path:"roles",component:roles},
         {path:"rights",component:rights},
-        {path:"goods",component:goods},
+        {
+            path:"goods",
+            component:goods,
+            children:[
+                { path:"add",component:goodsAdd},
+                { path:"",component:goodsList},
+            ]
+        
+         },
         {path:"params",component:params},
         {path:"categories",component:categories},
         {path:"orders",component:orders},
@@ -43,7 +53,7 @@ const routes=[
   //导航前置守卫
  router.beforeEach((to, from, next) => {
      if(to.matched.length==0){
-        next('error');
+        next('/error');
      }else{
          next();
      }

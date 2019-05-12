@@ -129,7 +129,20 @@ const request={
     //左侧菜单权限
     getMenus(){
         return axios.get('menus')
-    }
+    },
+    // 商品列表数据
+    getGoods(params){
+        return axios.get('goods',{
+            params
+        })
+    },
+
+    
+
+    //商品分类列表
+    getCategories(){
+        return axios.get(`categories?type=3`)
+    },
 }
 
 // 暴露出去 包含install方法的对象
