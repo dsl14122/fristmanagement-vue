@@ -13,49 +13,76 @@
       </el-col>
     </el-row>
     <!-- 表格 -->
-    <template>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="address" label="分类名称" width="180"></el-table-column>
-        <el-table-column prop="name" label="级别" width="180"></el-table-column>
-        <el-table-column prop="name" label="是否有效" width="180"></el-table-column>
-        <el-table-column prop="address" label="操作"></el-table-column>
+
+      <el-table :data="tableData" row-key="cat_id" border style="width: 100%">
+        <el-table-column prop="cat_name" label="分类名称" width="180"></el-table-column>
+        <el-table-column prop="" label="级别" width="180">
+          <template slot-scope="scope">
+            {{scope.row.cat_level==0?"一级":""}}
+            {{scope.row.cat_level==1?"二级":""}}
+            {{scope.row.cat_level==2?"三级":""}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="" label="是否有效" width="180">
+          <template slot-scope="scope">
+            {{scope.row.cat_deleted==false?"有效":"无效"}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="操作">
+          <template >
+          <el-button type="primary" class="el-icon-edit"></el-button>
+          <el-button type="danger" class="el-icon-delete"></el-button>
+        </template>
+        </el-table-column>
       </el-table>
-    </template>
+  
     <!-- 分页 -->
     <el-pagination
       :current-page="1"
       :page-sizes="[2, 4, 7, 9]"
       :page-size="3"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="50">
-    </el-pagination>
+      :total="50"
+    ></el-pagination>
   </div>
 </template>
 
 <script>
 export default {
   name: "categories",
-   data() {
-      return {
-        tableData: [{
-          date: '1',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '3',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '4',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }]
-      }
-    }
+  data() {
+    return {
+      tableData: [
+        {
+          date: "1",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          date: "2",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1517 弄"
+        },
+        {
+          date: "3",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1519 弄"
+        },
+        {
+          date: "4",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1516 弄"
+        }
+      ]
+    };
+  },
+  created() {
+     this.$request.getCategories().then(res=>{
+      //  console.log(res);
+      this.tableData=res.data.data
+       
+     })
+  },
 };
 </script>
 
