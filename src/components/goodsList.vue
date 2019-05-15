@@ -1,9 +1,9 @@
 <template>
-    <div id="goodsList">
-        <!-- 输入搜索框 -->
+  <div id="goodsList">
+    <!-- 输入搜索框 -->
     <el-row>
       <el-col :span="8">
-        <el-input placeholder="请输入内容"  class="input-with-select">
+        <el-input placeholder="请输入内容" class="input-with-select">
           <el-button slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </el-col>
@@ -22,7 +22,7 @@
           <template slot-scope="scope">{{scope.row.add_time | forMathTime}}</template>
         </el-table-column>
         <el-table-column prop="address" label="操作">
-          <template slot-scope="scope">
+          <template slot-scope="">
             <el-button
               type="primary"
               icon="el-icon-edit"
@@ -45,14 +45,14 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     ></el-pagination>
-    </div>
+  </div>
 </template>
 
 <script>
 // 日期导入
 import moment from "moment";
 export default {
- name:"goodsList",
+  name: "goodsList",
   data() {
     return {
       tableData: [
@@ -95,12 +95,11 @@ export default {
     }
   },
   methods: {
-    getgoods() {
-      this.$request.getGoods(this.goodsData).then(res => {
-        console.log(res);
-        this.tableData = res.data.data.goods;
-        this.total = res.data.data.total;
-      });
+    async getgoods() {
+      const res = await this.$request.getGoods(this.goodsData);
+      console.log(res);
+      this.tableData = res.data.data.goods;
+      this.total = res.data.data.total;
     },
     // 每页条数
     sizeChange(size) {
@@ -115,9 +114,8 @@ export default {
       this.getgoods();
     }
   }
-}
+};
 </script>
 
 <style>
-
 </style>

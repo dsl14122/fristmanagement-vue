@@ -102,18 +102,17 @@ export default {
       }
     };
   },
-  mounted() {
-    this.$request.getReports().then(res => {
-      //  console.log(res);
-      const backData = res.data.data;
-      for (const key in backData) {
-        this.option[key] = backData[key];
-      }
-      this.option.xAxis[0].boundaryGap=false
-      var myChart = echarts.init(document.getElementById("main"));
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(this.option);
-    });
+  async mounted() {
+    const res = await this.$request.getReports();
+    //  console.log(res);
+    const backData = res.data.data;
+    for (const key in backData) {
+      this.option[key] = backData[key];
+    }
+    this.option.xAxis[0].boundaryGap = false;
+    var myChart = echarts.init(document.getElementById("main"));
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(this.option);
   }
 };
 </script>

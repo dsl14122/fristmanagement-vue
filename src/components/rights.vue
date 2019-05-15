@@ -51,21 +51,19 @@ export default {
           name: "王小虎",
           address: "上海市普陀区金沙江路 1516 弄"
         }
-      ],
-
+      ]
     };
   },
   created() {
-      this.getRights()
+    this.getRights();
   },
   methods: {
-    getRights(){
-        this.$request.getRights().then(res=>{
-          console.log(res);
-          this.tableData=res.data.data
-        })
-    },
-  },
+    async getRights() {
+      const res = await this.$request.getRights();
+      console.log(res);
+      this.tableData = res.data.data;
+    }
+  }
 };
 </script>
 

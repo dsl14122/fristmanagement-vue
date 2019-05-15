@@ -24,20 +24,8 @@
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="attr_name" label="商品参数" width="180"></el-table-column>
             <el-table-column prop="address" label="操作">
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-
-                size="mini"
-                plain
-              ></el-button>
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-
-                size="mini"
-                plain
-              ></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" plain></el-button>
+              <el-button type="danger" icon="el-icon-delete" size="mini" plain></el-button>
             </el-table-column>
           </el-table>
         </template>
@@ -51,20 +39,8 @@
             <el-table-column prop="attr_name" label="属性名称 " width="200"></el-table-column>
             <el-table-column prop="attr_vals" label="属性值" width="300"></el-table-column>
             <el-table-column prop label="操作">
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-               
-                size="mini"
-                plain
-              ></el-button>
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-               
-                size="mini"
-                plain
-              ></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" plain></el-button>
+              <el-button type="danger" icon="el-icon-delete" size="mini" plain></el-button>
             </el-table-column>
           </el-table>
         </template>
@@ -360,25 +336,23 @@ export default {
       dynameicTable: []
     };
   },
-  created() {
-    this.$request.getCategories().then(res => {
-      console.log(res);
-      this.options = res.data.data;
-    });
+  async created() {
+    const res = await this.$request.getCategories();
+    console.log(res);
+    this.options = res.data.data;
   },
   methods: {
-    change(value) {
+    async change(value) {
       if (value.length == 3) {
         const id = value[2];
 
-        this.$request.getStatic(id).then(res => {
-          // console.log(res);
-          this.staticTable = res.data.data;
-        });
-        this.$request.getDynamic(id).then(res => {
-          console.log(res);
-          this.dynameicTable = res.data.data;
-        });
+        let res = await this.$request.getStatic(id);
+        // console.log(res);
+        this.staticTable = res.data.data;
+
+        res = await this.$request.getDynamic(id);
+        console.log(res);
+        this.dynameicTable = res.data.data;
       }
     }
   }

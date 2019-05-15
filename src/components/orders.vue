@@ -24,7 +24,7 @@
           <template slot-scope="scope">{{scope.row.create_time | forMathTime}}</template>
         </el-table-column>
         <el-table-column prop label="操作">
-          <template slot-scope="scope">
+          <template slot-scope="">
             <el-button
               type="primary"
               icon="el-icon-edit"
@@ -46,13 +46,13 @@
     ></el-pagination>
     <!-- 修改弹框 -->
     <el-dialog title="修改订单地址" :visible.sync="editVisible">
-      <el-form :model="editForm"  ref="editForm">
+      <el-form :model="editForm" ref="editForm">
         <el-form-item label="省市区/县" label-width="120px">
-          <el-cascader :options="options" v-model="selectedOptions" ></el-cascader>
-        <v-distpicker></v-distpicker>
+          <el-cascader :options="options" v-model="selectedOptions"></el-cascader>
+          <v-distpicker></v-distpicker>
         </el-form-item>
         <el-form-item label="详细地址" label-width="120px">
-          <el-input  autocomplete="off"></el-input>
+          <el-input autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -67,9 +67,9 @@
 // 日期导入
 import moment from "moment";
 // 饿了么省级联动
-import options from '../assets/city_data2017_element.js'
+import options from "../assets/city_data2017_element.js";
 //局部使用 省级联动
-import VDistpicker from 'v-distpicker'
+import VDistpicker from "v-distpicker";
 export default {
   name: "orders",
   components: { VDistpicker },
@@ -103,9 +103,9 @@ export default {
         pagesize: 10
       },
       //修改地址
-      editVisible:false,
+      editVisible: false,
       options,
-      selectedOptions:[]
+      selectedOptions: []
     };
   },
   filters: {
@@ -113,11 +113,10 @@ export default {
       return moment(value).format("YYYY-MM-DD HH:mm:ss");
     }
   },
-  created() {
-    this.$request.getOrders(this.ordersData).then(res => {
-      console.log(res);
-      this.tableData = res.data.data.goods;
-    });
+  async created() {
+    const res = await this.$request.getOrders(this.ordersData);
+    console.log(res);
+    this.tableData = res.data.data.goods;
   }
 };
 </script>

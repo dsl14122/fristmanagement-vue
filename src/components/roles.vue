@@ -20,25 +20,40 @@
             <!-- 第一层 -->
             <el-row v-for="(item1,index) in props.row._children" :key="index">
               <el-col :span="6">
-             <el-tag  :key="item1.id" @close="delRights(props.row,item1.id)" closable type="primary">{{item1.authName}}</el-tag>
-             <span class="el-icon-arrow-right"></span>
+                <el-tag
+                  :key="item1.id"
+                  @close="delRights(props.row,item1.id)"
+                  closable
+                  type="primary"
+                >{{item1.authName}}</el-tag>
+                <span class="el-icon-arrow-right"></span>
               </el-col>
               <el-col :span="18">
                 <!-- 第二层 -->
-               <el-row v-for="(item2,i) in item1.children" :key="i">
-              <el-col :span="6">
-             <el-tag  :key="item2.id" @close="delRights(props.row,item2.id)" closable type="success">{{item2.authName}}</el-tag>
-             <span class="el-icon-arrow-right"></span>
-              </el-col>
-              <el-col :span="18">
-               <!-- 第三层 -->
-              <el-tag  class="my-tag" v-for="(item3,j) in item2.children" :key="item3.id" @close="delRights(props.row,item3.id)" closable type="warning">{{item3.authName}}</el-tag>
-              </el-col>
-              </el-row>
-
+                <el-row v-for="(item2,i) in item1.children" :key="i">
+                  <el-col :span="6">
+                    <el-tag
+                      :key="item2.id"
+                      @close="delRights(props.row,item2.id)"
+                      closable
+                      type="success"
+                    >{{item2.authName}}</el-tag>
+                    <span class="el-icon-arrow-right"></span>
+                  </el-col>
+                  <el-col :span="18">
+                    <!-- 第三层 -->
+                    <el-tag
+                      class="my-tag"
+                      v-for="(item3,j) in item2.children"
+                      :key="item3.id"
+                      @close="delRights(props.row,item3.id)"
+                      closable
+                      type="warning"
+                    >{{item3.authName}}</el-tag>
+                  </el-col>
+                </el-row>
               </el-col>
             </el-row>
-          
           </template>
         </el-table-column>
 
@@ -104,9 +119,15 @@
     </el-dialog>
     <!-- 权限弹框 -->
     <el-dialog title="分配权限" :visible.sync="rightsVisible">
-      <el-tree :data="rightsData" :props="rightsProps" show-checkbox default-expand-all node-key="id" ref="tree"  :default-checked-keys="defaultCheckedKeys" >
-
-      </el-tree>
+      <el-tree
+        :data="rightsData"
+        :props="rightsProps"
+        show-checkbox
+        default-expand-all
+        node-key="id"
+        ref="tree"
+        :default-checked-keys="defaultCheckedKeys"
+      ></el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="rightsVisible = false">取 消</el-button>
         <el-button type="primary" @click="setRolerights">确 定</el-button>
@@ -177,17 +198,14 @@ export default {
       },
       //权限分配
       rightsVisible: false,
-      rightsForm:{
-
-      },
-      rightsData:[],
+      rightsForm: {},
+      rightsData: [],
       rightsProps: {
-          children: 'children',
-          label: 'authName'
-        },
-        //默认选中权限
-       defaultCheckedKeys:[],
-
+        children: "children",
+        label: "authName"
+      },
+      //默认选中权限
+      defaultCheckedKeys: []
     };
   },
   created() {
@@ -195,40 +213,36 @@ export default {
   },
   methods: {
     //角色编辑
-    handleEdit(row) {
+    async handleEdit(row) {
       this.editVisible = true;
       // console.log(row);
-      this.$request.selectRolesById(row.id).then(res => {
-        // console.log(res);
-        // 获取数据
-        this.editForm = res.data.data;
-      });
+      const res = await this.$request.selectRolesById(row.id);
+      // console.log(res);
+      // 获取数据
+      this.editForm = res.data.data;
     },
     //分配角色
-    handleRole(row) {
+    async handleRole(row) {
       // console.log(row);
-       this.rightsVisible=true;
-       this.rightsForm=row;
-       this.$request.getTreeRights().then(res=>{
-         console.log(res);
-          this.rightsData=res.data.data;
-          let checkedIds=[]
-          function getCheckedKeys(item){
-            // 查找后代的children 如果有 就遍历 并且 添加到数组中
-            item._children.forEach(v=>{
-              checkedIds.push(v.id)
-              if(v.children){
-                v._children=v.children
-                getCheckedKeys(v)
-              }
-            })
+      this.rightsVisible = true;
+      this.rightsForm = row;
+      const res = await this.$request.getTreeRights();
+      console.log(res);
+      this.rightsData = res.data.data;
+      let checkedIds = [];
+      function getCheckedKeys(item) {
+        // 查找后代的children 如果有 就遍历 并且 添加到数组中
+        item._children.forEach(v => {
+          checkedIds.push(v.id);
+          if (v.children) {
+            v._children = v.children;
+            getCheckedKeys(v);
           }
-          getCheckedKeys(row)
-         // 设置到data中
-         this.defaultCheckedKeys=checkedIds
-
-       })
-
+        });
+      }
+      getCheckedKeys(row);
+      // 设置到data中
+      this.defaultCheckedKeys = checkedIds;
     },
     // 弹框删除事件
     handleDelete(row) {
@@ -239,13 +253,12 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() => {
-          this.$request.deleteRoles(row.id).then(res => {
-            console.log(res);
-            if (res.data.meta.status == 200) {
-              this.getRoles();
-            }
-          });
+        .then(async () => {
+          const res = await this.$request.deleteRoles(row.id);
+          console.log(res);
+          if (res.data.meta.status == 200) {
+            this.getRoles();
+          }
         })
         .catch(() => {
           this.$message({
@@ -256,60 +269,55 @@ export default {
     },
 
     //数据渲染
-    getRoles() {
-      this.$request.getRoles().then(res => {
-        console.log(res);
-        let data = res.data.data;
-        data.forEach(v => {
-          v._children = v.children;
-          //删除children
-          delete v.children;
-        });
-        this.tableData = data;
+    async getRoles() {
+      const res = await this.$request.getRoles();
+      console.log(res);
+      let data = res.data.data;
+      data.forEach(v => {
+        v._children = v.children;
+        //删除children
+        delete v.children;
       });
+      this.tableData = data;
     },
 
     //增添用户
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate(async valid => {
         if (valid) {
           // 数据正确
           if (formName == "editForm") {
             this.editForm.id = this.editForm.roleId;
-            this.$request.editRoles(this.editForm).then(res => {
-              // console.log(res);
-              if (res.data.meta.status == 200) {
-                //重新获取数据
-                this.getRoles();
-                //  关闭弹框
-                this.editVisible = false;
-                this.$refs[formName].resetFields();
-              }
-            });
-          } else if (formName == "roleForm") {
-            this.$request
-              .updateRoles({
-                id: this.roleForm.id,
-                rid: this.roleValue
-              })
-              .then(res => {
-                if (res.data.meta.status == 200) {
-                  // 重新获取角色
-                  this.getusers();
-                  // 关闭角色框
-                  this.roleVisible = false;
-                }
-              });
-          } else {
-            this.$request.addRoles(this.addForm).then(res => {
-              console.log(res);
-              // 关闭弹框
-              this.addVisible = false;
-              // 重新获取数据
+            const res = await this.$request.editRoles(this.editForm);
+            // console.log(res);
+            if (res.data.meta.status == 200) {
+              //重新获取数据
               this.getRoles();
-              // 重置表单
+              //  关闭弹框
+              this.editVisible = false;
               this.$refs[formName].resetFields();
+            }
+          } else if (formName == "roleForm") {
+            const res = await this.$request.updateRoles({
+              id: this.roleForm.id,
+              rid: this.roleValue
             });
+
+            if (res.data.meta.status == 200) {
+              // 重新获取角色
+              this.getusers();
+              // 关闭角色框
+              this.roleVisible = false;
+            }
+          } else {
+            const res = await this.$request.addRoles(this.addForm);
+            console.log(res);
+            // 关闭弹框
+            this.addVisible = false;
+            // 重新获取数据
+            this.getRoles();
+            // 重置表单
+            this.$refs[formName].resetFields();
           }
         } else {
           // 数据有误
@@ -319,34 +327,30 @@ export default {
       });
     },
     // 删除权限
-    delRights(row,rightId){
-       this.$request.deleteRight({
-         roleId:row.id,
-         rightId
-       }).then(res=>{
-          row._children=res.data.data
-       })
+    async delRights(row, rightId) {
+      const res = await this.$request.deleteRight({
+        roleId: row.id,
+        rightId
+      });
+      row._children = res.data.data;
     },
     // 角色授权
-    setRolerights(){
+    async setRolerights() {
       // join方法 把数组 按照传入的值 拼接起来
-      const rids= this.$refs.tree.getCheckedKeys().join(",")
-       this.$request.setRolerights({
-         roleId:this.rightsForm.id,
-         rids
-       }).then(res=>{
-           console.log(res);
-           if(res.data.meta.status=="200"){
-               this.rightsVisible = false;
-               this.getRoles();
-
-           }
-          //  重新获取菜单数据并保存到vuex中
-           this.$request.getMenus().then(res=>{
-             this.$store.commit("changeMenuList",res.data.data)
-           })
-       })
-        
+      const rids = this.$refs.tree.getCheckedKeys().join(",");
+      const res = await this.$request.setRolerights({
+        roleId: this.rightsForm.id,
+        rids
+      });
+      console.log(res);
+      if (res.data.meta.status == "200") {
+        this.rightsVisible = false;
+        this.getRoles();
+      }
+      //  重新获取菜单数据并保存到vuex中
+      this.$request.getMenus().then(res => {
+        this.$store.commit("changeMenuList", res.data.data);
+      });
     }
   }
 };
@@ -361,7 +365,7 @@ export default {
     font-size: 15px;
     padding-left: 10px;
   }
-  .my-tag{
+  .my-tag {
     margin-right: 5px;
     margin-bottom: 5px;
   }

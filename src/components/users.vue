@@ -197,7 +197,7 @@ export default {
         email: "",
         mobile: ""
       },
-      
+
       editForm: {
         username: "",
         email: "",
@@ -214,14 +214,13 @@ export default {
     };
   },
   methods: {
-    handleEdit(index, row) {
+    async handleEdit(index, row) {
       // console.log(row);
-      this.$request.getuserbyid(row.id).then(res => {
-        //数据获取
-        this.editForm = res.data.data;
-        // 弹框
-        this.editVisible = true;
-      });
+      const res = await this.$request.getuserbyid(row.id);
+      //数据获取
+      this.editForm = res.data.data;
+      // 弹框
+      this.editVisible = true;
     },
     //删除用户
     handleDelete(index, row) {
@@ -232,15 +231,14 @@ export default {
         cancelButtonText: "算了吧",
         type: "warning"
       })
-        .then(() => {
+        .then(async () => {
           // 调用接口
-          this.$request.deleteUsers(row.id).then(res => {
-            // console.log(res);
-            // 重新获取数据
-            if (res.data.meta.status == 200) {
-              this.getusers();
-            }
-          });
+          const res = await this.$request.deleteUsers(row.id);
+          // console.log(res);
+          // 重新获取数据
+          if (res.data.meta.status == 200) {
+            this.getusers();
+          }
         })
         .catch(() => {
           this.$message({
@@ -250,50 +248,45 @@ export default {
         });
     },
     //更改状态
-    stateChange(row) {
-      this.$request
-        .updateStatus({ id: row.id, type: row.mg_state })
-        .then(res => {
-          //  console.log(res);
-        });
+    async stateChange(row) {
+      const res = await this.$request.updateStatus({
+        id: row.id,
+        type: row.mg_state
+      });
     },
     //增添用户
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate(async valid => {
         if (valid) {
           // 数据正确
           if (formName == "editForm") {
-            this.$request.updateUser(this.editForm).then(res => {
-              if (res.data.meta.status == 200) {
-                //重新获取数据
-                this.getusers();
-                //  关闭弹框
-                this.editVisible = false;
-              }
-            });
-          }else if(formName == "roleForm"){
-               this.$request.updateRoles({
-                 id:this.roleForm.id,
-                 rid:this.roleValue
-               }).then(res=>{
-                 if (res.data.meta.status == 200) {
-                  // 重新获取角色
-                  this.getusers();
-                  // 关闭角色框
-                  this.roleVisible = false;
-                }
-
-               })
-
-          }else {
-            this.$request.addUsers(this.addForm).then(res => {
-              console.log(res);
-              // 关闭弹框
-              this.addVisible = false;
-              // 重新获取数据
+            const res = await this.$request.updateUser(this.editForm);
+            if (res.data.meta.status == 200) {
+              //重新获取数据
               this.getusers();
-              // 重置表单
+              //  关闭弹框
+              this.editVisible = false;
+            }
+          } else if (formName == "roleForm") {
+            const res = await this.$request.updateRoles({
+              id: this.roleForm.id,
+              rid: this.roleValue
             });
+
+            if (res.data.meta.status == 200) {
+              // 重新获取角色
+              this.getusers();
+              // 关闭角色框
+              this.roleVisible = false;
+            }
+          } else {
+            const res = await this.$request.addUsers(this.addForm);
+            console.log(res);
+            // 关闭弹框
+            this.addVisible = false;
+            // 重新获取数据
+            this.getusers();
+            // 重置表单
           }
         } else {
           // 数据有误
@@ -306,12 +299,11 @@ export default {
       this.$refs[formName].resetFields();
     },
     // 数据获取
-    getusers() {
-      this.$request.getusers(this.userData).then(res => {
-        // console.log(res);
-        this.tableData = res.data.data.users;
-        this.total = res.data.data.total;
-      });
+    async getusers() {
+      const res = await this.$request.getusers(this.userData);
+      // console.log(res);
+      this.tableData = res.data.data.users;
+      this.total = res.data.data.total;
     },
     // 每页条数
     sizeChange(size) {
@@ -327,17 +319,16 @@ export default {
     },
 
     //弹出角色框
-    handleRole(row) {
-      this.$request.getuserbyid(row.id).then(res => {
-        //  保存数据
-        this.roleForm = res.data.data;
-        this.$request.getRoles().then(res => {
-          this.roles = res.data.data;
-          //弹框
-          this.roleVisible = true;
-          // 设置默认选中
-          this.roleValue = this.roleForm.rid;
-        });
+    async handleRole(row) {
+      const res = await this.$request.getuserbyid(row.id);
+      //  保存数据
+      this.roleForm = res.data.data;
+      this.$request.getRoles().then(res => {
+        this.roles = res.data.data;
+        //弹框
+        this.roleVisible = true;
+        // 设置默认选中
+        this.roleValue = this.roleForm.rid;
       });
     }
   },

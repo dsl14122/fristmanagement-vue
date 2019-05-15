@@ -14,28 +14,26 @@
     </el-row>
     <!-- 表格 -->
 
-      <el-table :data="tableData" row-key="cat_id" border style="width: 100%">
-        <el-table-column prop="cat_name" label="分类名称" width="180"></el-table-column>
-        <el-table-column prop="" label="级别" width="180">
-          <template slot-scope="scope">
-            {{scope.row.cat_level==0?"一级":""}}
-            {{scope.row.cat_level==1?"二级":""}}
-            {{scope.row.cat_level==2?"三级":""}}
-          </template>
-        </el-table-column>
-        <el-table-column prop="" label="是否有效" width="180">
-          <template slot-scope="scope">
-            {{scope.row.cat_deleted==false?"有效":"无效"}}
-          </template>
-        </el-table-column>
-        <el-table-column prop="address" label="操作">
-          <template >
+    <el-table :data="tableData" row-key="cat_id" border style="width: 100%">
+      <el-table-column prop="cat_name" label="分类名称" width="180"></el-table-column>
+      <el-table-column prop label="级别" width="180">
+        <template slot-scope="scope">
+          {{scope.row.cat_level==0?"一级":""}}
+          {{scope.row.cat_level==1?"二级":""}}
+          {{scope.row.cat_level==2?"三级":""}}
+        </template>
+      </el-table-column>
+      <el-table-column prop label="是否有效" width="180">
+        <template slot-scope="scope">{{scope.row.cat_deleted==false?"有效":"无效"}}</template>
+      </el-table-column>
+      <el-table-column prop="address" label="操作">
+        <template>
           <el-button type="primary" class="el-icon-edit"></el-button>
           <el-button type="danger" class="el-icon-delete"></el-button>
         </template>
-        </el-table-column>
-      </el-table>
-  
+      </el-table-column>
+    </el-table>
+
     <!-- 分页 -->
     <el-pagination
       :current-page="1"
@@ -76,13 +74,11 @@ export default {
       ]
     };
   },
-  created() {
-     this.$request.getCategories().then(res=>{
-      //  console.log(res);
-      this.tableData=res.data.data
-       
-     })
-  },
+  async created() {
+    const res = await this.$request.getCategories();
+    //  console.log(res);
+    this.tableData = res.data.data;
+  }
 };
 </script>
 
